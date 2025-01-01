@@ -9,12 +9,17 @@ service MicroServiceTwoService {
     rpc MethodTwo(MethodRequest) returns (MethodResponse);
 }
 
+message Name{
+    string name = 1;
+}
+
 message MethodRequest {
     int32 method_number = 1;
     int32 wait_time = 2;
+    repeated Name names = 3;
 }
 
 message MethodResponse {
-    repeated string user_names = 1;
+    repeated Name user_names = 1;
 }
-  
+

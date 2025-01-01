@@ -17,6 +17,7 @@ type Repository interface {
 	GetUserDetailsById(ctx context.Context, id int) (*User, error)
 	UpdateUserProfile(ctx context.Context, updateUser UserProfileDetails, id int) error
 	DeleteUserProfile(ctx context.Context, id int64) error
+	ListUsers(ctx context.Context) ([]User, error)
 }
 
 func NewRepository(db *gorm.DB) Repository {
@@ -56,23 +57,66 @@ func (r *repository) GetUserDetailsById(ctx context.Context, id int) (*User, err
 	return user, nil
 }
 
-func (r *repository) UpdateUserProfile(ctx context.Context, updateUser UserProfileDetails, id int) error {
-	r.db.Set("gorm:association_autoupdate", false).Set("gorm:association_autocreate", false)
+// func (r *repository) UpdateUserProfile(ctx context.Context, updateUser UserProfileDetails, id int) error {
+// 	r.db.Set("gorm:association_autoupdate", false).Set("gorm:association_autocreate", false)
 
-	result := r.db.Model(&User{}).Where("id = ?", id).Updates(updateUser)
-	if result.Error != nil {
-		return result.Error
-	}
-	updatedUser := User{}
-	if err := r.db.Where("id=?", id).First(&updatedUser).Error; err != nil {
-		return err
-	}
-	return nil
-}
+//		result := r.db.Model(&User{}).Where("id = ?", id).Updates(updateUser)
+//		if result.Error != nil {
+//			return result.Error
+//		}
+//		updatedUser := User{}
+//		if err := r.db.Where("id=?", id).First(&updatedUser).Error; err != nil {
+//			return err
+//		}
+//		return nil
+//	}
 func (r *repository) DeleteUserProfile(ctx context.Context, id int64) error {
 	err := r.db.Where("id = ?", id).Delete(&User{}).Error
 	if err != nil {
 		return fmt.Errorf("failed to delete user profile with id %d: %w", id, err)
 	}
+	return nil
+}
+
+func (r *repository) ListUsers(ctx context.Context) ([]User, error) {
+	users := []User{}
+	if err := r.db.Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
+func (r *repository) UpdateUserProfile(ctx context.Context, updateUser UserProfileDetails, id int) error {
+	// Prepare a map for dynamic updates
+	updateFields := map[string]interface{}{}
+
+	if updateUser.Username != "" {
+		updateFields["username"] = updateUser.Username
+	}
+	if updateUser.FirstName != "" {
+		updateFields["firstname"] = updateUser.FirstName
+	}
+	if updateUser.LastName != "" {
+		updateFields["lastname"] = updateUser.LastName
+	}
+	if updateUser.PhoneNumber != "" {
+		updateFields["phone"] = updateUser.PhoneNumber
+	}
+	if updateUser.Email != "" {
+		updateFields["email"] = updateUser.Email
+	}
+	if updateUser.DateOfBirth != "" {
+		updateFields["dateofbirth"] = updateUser.DateOfBirth
+	}
+	if updateUser.Gender != "" {
+		updateFields["gender"] = updateUser.Gender
+	}
+
+	// Perform the update with dynamic fields
+	result := r.db.Model(&User{}).Where("id = ?", id).Updates(updateFields)
+	if result.Error != nil {
+		return result.Error
+	}
+
 	return nil
 }

@@ -23,7 +23,7 @@ func (h *Handler) Routes(r *gin.RouterGroup) {
 	r.PUT("/profile/:id", h.updateUserProfile)
 	r.DELETE("/profile/:id", h.deleteUserProfile)
 	r.GET("/profile/:id", h.getUserProfileDetails)
-	r.GET("/users", h.listUsers)
+	r.POST("/methods", h.listUsers)
 }
 
 func (h *Handler) registerUser(ctx *gin.Context) {
@@ -94,13 +94,13 @@ func (h *Handler) listUsers(ctx *gin.Context) {
 		h.responseWithError(ctx, http.StatusBadRequest, errors.New(formattedError))
 		return
 	}
-	users, err := h.svc.ListUsers(ctx, listUserRq)
+	userNames, err := h.svc.ListUsers(ctx, listUserRq)
 	if err != nil {
 		formattedError := ExtractErrorMessage(err)
 		h.responseWithError(ctx, http.StatusInternalServerError, errors.New(formattedError))
 		return
 	}
-	h.responseWithData(ctx, http.StatusOK, "list users successfull", users)
+	h.responseWithData(ctx, http.StatusOK, "list users successfull", userNames)
 }
 
 func (h *Handler) deleteUserProfile(ctx *gin.Context) {

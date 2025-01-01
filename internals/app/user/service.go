@@ -15,7 +15,7 @@ import (
 type service struct {
 	repo             Repository
 	redisClient      *redis.Client
-	serviceTwoclient grpcproto.MicroServiceTwoServiceClient
+	serviceTwoClient grpcproto.MicroServiceTwoServiceClient
 }
 
 type Service interface {
@@ -23,7 +23,7 @@ type Service interface {
 	GetUserProfileDetails(ctx context.Context, userId int) (*UserProfileDetails, error)
 	UpdateUserProfile(ctx context.Context, id int, user UserProfileDetails) error
 	DeleteUserProfile(ctx context.Context, id int) error
-	ListUsers(ctx context.Context, listUserReq ListUserRequest) ([]UserProfileDetails, error)
+	ListUsers(ctx context.Context, listUserReq ListUserRequest) ([]string, error)
 	SetToCache(ctx context.Context, cacheKey string, data interface{}, expiration time.Duration) error
 	GetFromCache(ctx context.Context, cacheKey string, result interface{}) error
 }
@@ -129,7 +129,11 @@ func (s *service) UpdateUserProfile(ctx context.Context, id int, user UserProfil
 	if err != nil {
 		fmt.Printf("Failed to invalidate cache for user %d: %v\n", id, err)
 	}
-	err = s.SetToCache(ctx, cacheKey, user, time.Hour)
+	updatedUser, err := s.repo.GetUserDetailsById(ctx, id)
+	if err != nil {
+		return err
+	}
+	err = s.SetToCache(ctx, cacheKey, updatedUser, time.Hour)
 	if err != nil {
 		fmt.Printf("Failed to set updated cache for user %d: %v\n", id, err)
 		return fmt.Errorf("failed to update cache for user: %w", err)
@@ -139,7 +143,7 @@ func (s *service) UpdateUserProfile(ctx context.Context, id int, user UserProfil
 
 func (s *service) DeleteUserProfile(ctx context.Context, id int) error {
 	err := s.repo.DeleteUserProfile(ctx, int64(id))
-	if err != nil {
+	if err != nil && err != gorm.ErrRecordNotFound {
 		return err
 	}
 	cacheKey := fmt.Sprintf("user:%d", id)
@@ -149,12 +153,46 @@ func (s *service) DeleteUserProfile(ctx context.Context, id int) error {
 	}
 	return nil
 }
+func (s *service) ListUsers(ctx context.Context, listUserReq ListUserRequest) ([]string, error) {
+	users, err := s.repo.ListUsers(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch users: %w", err)
+	}
 
-func (s *service) ListUsers(ctx context.Context, listUserReq ListUserRequest) ([]UserProfileDetails, error) {
-	if listUserReq.Method == 1 {
-		s.serviceTwoclient.MethodOne(ctx, &grpcproto.MethodRequest{
+	names := make([]*grpcproto.Name, len(users))
+	for i, user := range users {
+		names[i] = &grpcproto.Name{Name: user.Username}
+	}
+
+	var res *grpcproto.MethodResponse
+	switch listUserReq.Method {
+	case 1:
+		res, err = s.serviceTwoClient.MethodOne(ctx, &grpcproto.MethodRequest{
 			MethodNumber: listUserReq.Method,
 			WaitTime:     listUserReq.WaitTime,
+			Names:        names,
 		})
+	case 2:
+		res, err = s.serviceTwoClient.MethodTwo(ctx, &grpcproto.MethodRequest{
+			MethodNumber: listUserReq.Method,
+			WaitTime:     listUserReq.WaitTime,
+			Names:        names,
+		})
+	default:
+		return nil, errors.New("invalid method number")
 	}
+
+	if err != nil {
+		return nil, fmt.Errorf("gRPC call failed: %w", err)
+	}
+
+	userNames := make([]string, len(res.UserNames))
+	for i, username := range res.UserNames {
+		userNames[i] = username.Name
+	}
+
+	if len(userNames) == 0 {
+		return nil, errors.New("no users found")
+	}
+	return userNames, nil
 }
