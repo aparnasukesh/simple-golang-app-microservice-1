@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: microservice-one
-          image: aparnasukesh/microservice-one:latest
+          image: aparnasukesh/microservice-one-svc:latest
           ports:
             - containerPort: 8080
           resources:
