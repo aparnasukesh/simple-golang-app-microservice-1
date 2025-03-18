@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microservice-one
+  namespace: machine-task  # Added namespace
+  labels:
+    app: microservice-one
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: microservice-one
+  template:
+    metadata:
+      labels:
+        app: microservice-one
+    spec:
+      containers:
+        - name: microservice-one
+          image: aparnasukesh/microservice-one:latest
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: microservice-one
+  namespace: second-project  # Added namespace
+  labels:
+    app: microservice-one
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: microservice-one
