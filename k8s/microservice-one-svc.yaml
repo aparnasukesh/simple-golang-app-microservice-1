@@ -32,7 +32,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: microservice-one
-  namespace: second-project  # Added namespace
+  namespace: machine-task  # Added namespace
   labels:
     app: microservice-one
 spec:
