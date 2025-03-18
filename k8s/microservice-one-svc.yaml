@@ -6,7 +6,7 @@ metadata:
   labels:
     app: microservice-one
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: microservice-one
