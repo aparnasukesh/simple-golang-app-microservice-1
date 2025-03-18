@@ -61,13 +61,13 @@ jobs:
       - name: Debug - List Root Directory
         run: ls -R .
 
-      - name: Apply Postgres Kubernetes manifest
-        run: |
-          kubectl apply -f k8s/postgres-db.yaml
+      # - name: Apply Postgres Kubernetes manifest
+      #   run: |
+      #     kubectl apply -f k8s/postgres-db.yaml
 
-      - name: Apply Redis Kubernetes manifest
-        run: |
-          kubectl apply -f k8s/redis-deployment.yaml
+      # - name: Apply Redis Kubernetes manifest
+      #   run: |
+      #     kubectl apply -f k8s/redis-deployment.yaml
           
       - name: Apply Microservice One Kubernetes manifest
         run: |
