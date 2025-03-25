@@ -93,9 +93,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: microservice1
-  namespace: second-project
+  namespace: machine-task
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: microservice1
@@ -106,12 +106,12 @@ spec:
     spec:
       containers:
       - name: microservice1
-        image: your-docker-image1
+        image: aparnasukesh/microservice-one-svc:latest
         ports:
         - containerPort: 8080
         env:
         - name: GRPC_SERVICE_HOST
-          value: "microservice2-service.second-project.svc.cluster.local"
+          value: "microservice2-service.machine-task.svc.cluster.local"
         - name: GRPC_SERVICE_PORT
           value: "50051"
 ---
@@ -119,7 +119,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: microservice1-service
-  namespace: second-project
+  namespace: machine-task
 spec:
   selector:
     app: microservice1
