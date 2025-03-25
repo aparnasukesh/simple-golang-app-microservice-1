@@ -1,44 +1,130 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: microservice-one
+#   namespace: machine-task  
+#   labels:
+#     app: microservice-one
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: microservice-one
+#   template:
+#     metadata:
+#       labels:
+#         app: microservice-one
+#     spec:
+#       containers:
+#         - name: microservice-one
+#           image: aparnasukesh/microservice-one-svc:latest
+#           ports:
+#             - containerPort: 8080
+#           resources:
+#             requests:
+#               memory: "64Mi"
+#               cpu: "125m"
+#             limits:
+#               memory: "64Mi"
+#               cpu: "125m"
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: microservice-one
+#   namespace: machine-task 
+#   labels:
+#     app: microservice-one
+# spec:
+#   type: LoadBalancer
+#   ports:
+#     - port: 8080
+#       targetPort: 8080
+#   selector:
+#     app: microservice-one
+
+# apiVersion: apps/v1
+# kind: DeploymentapiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: microservice-one
+#   namespace: machine-task  
+#   labels:
+#     app: microservice-one
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: microservice-one
+#   template:
+#     metadata:
+#       labels:
+#         app: microservice-one
+#     spec:
+#       containers:
+#         - name: microservice-one
+#           image: aparnasukesh/microservice-one-svc:latest
+#           ports:
+#             - containerPort: 8080
+#           resources:
+#             requests:
+#               memory: "64Mi"
+#               cpu: "125m"
+#             limits:
+#               memory: "64Mi"
+#               cpu: "125m"
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: microservice-one
+#   namespace: machine-task 
+#   labels:
+#     app: microservice-one
+# spec:
+#   type: LoadBalancer
+#   ports:
+#     - port: 8080
+#       targetPort: 8080
+#   selector:
+#     app: microservice-one
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: microservice-one
-  namespace: machine-task  
-  labels:
-    app: microservice-one
+  name: microservice1
+  namespace: second-project
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
-      app: microservice-one
+      app: microservice1
   template:
     metadata:
       labels:
-        app: microservice-one
+        app: microservice1
     spec:
       containers:
-        - name: microservice-one
-          image: aparnasukesh/microservice-one-svc:latest
-          ports:
-            - containerPort: 8080
-          resources:
-            requests:
-              memory: "64Mi"
-              cpu: "125m"
-            limits:
-              memory: "64Mi"
-              cpu: "125m"
+      - name: microservice1
+        image: your-docker-image1
+        ports:
+        - containerPort: 8080
+        env:
+        - name: GRPC_SERVICE_HOST
+          value: "microservice2-service.second-project.svc.cluster.local"
+        - name: GRPC_SERVICE_PORT
+          value: "50051"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: microservice-one
-  namespace: machine-task 
-  labels:
-    app: microservice-one
+  name: microservice1-service
+  namespace: second-project
 spec:
-  type: LoadBalancer
-  ports:
-    - port: 8080
-      targetPort: 8080
   selector:
-    app: microservice-one
+    app: microservice1
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: ClusterIP
