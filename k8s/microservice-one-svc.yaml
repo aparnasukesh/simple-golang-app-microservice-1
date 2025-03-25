@@ -113,7 +113,7 @@ spec:
         - name: GRPC_SERVICE_HOST
           value: "microservice2-service.machine-task.svc.cluster.local"
         - name: GRPC_SERVICE_PORT
-          value: "50051"
+          value: "5055"
 ---
 apiVersion: v1
 kind: Service
