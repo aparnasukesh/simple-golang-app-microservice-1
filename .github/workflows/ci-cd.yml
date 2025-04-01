@@ -56,18 +56,18 @@ jobs:
 
       - name: Configure kubectl for EKS
         run: |
-          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name bookyourshow
+          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name machine-task
 
       - name: Debug - List Root Directory
         run: ls -R .
 
-      # - name: Apply Postgres Kubernetes manifest
-      #   run: |
-      #     kubectl apply -f k8s/postgres-db.yaml
+      - name: Apply Postgres Kubernetes manifest
+        run: |
+          kubectl apply -f k8s/postgres-db.yaml
 
-      # - name: Apply Redis Kubernetes manifest
-      #   run: |
-      #     kubectl apply -f k8s/redis-deployment.yaml
+      - name: Apply Redis Kubernetes manifest
+        run: |
+          kubectl apply -f k8s/redis-deployment.yaml
           
       - name: Apply Microservice One Kubernetes manifest
         run: |
