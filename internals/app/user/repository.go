@@ -94,7 +94,7 @@ func (r *repository) UpdateUserProfile(ctx context.Context, updateUser UserProfi
 		updateFields["username"] = updateUser.Username
 	}
 	if updateUser.FirstName != "" {
-		updateFields["firstname"] = updateUser.FirstName
+		updateFields["first_name"] = updateUser.FirstName
 	}
 	if updateUser.LastName != "" {
 		updateFields["lastname"] = updateUser.LastName

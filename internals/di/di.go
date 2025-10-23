@@ -23,7 +23,7 @@ func InitResources(cfg config.Config) (*user.Handler, error) {
 		log.Fatal(err)
 	}
 
-	serviceTwoClient, err := grpcclient.NewMicroServiceTwoServiceClient(cfg.MicroserviceTwoPort)
+	serviceTwoClient, err := grpcclient.NewMicroServiceTwoServiceClient() //cfg.MicroserviceTwoPort)
 	if err != nil {
 		return nil, err
 	}
