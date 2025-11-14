@@ -119,6 +119,7 @@ func (s *service) GetUserProfileDetails(ctx context.Context, userId int) (*UserP
 		Gender:      user.Gender,
 	}, nil
 }
+
 func (s *service) UpdateUserProfile(ctx context.Context, id int, user UserProfileDetails) error {
 	err := s.repo.UpdateUserProfile(ctx, user, id)
 	if err != nil {

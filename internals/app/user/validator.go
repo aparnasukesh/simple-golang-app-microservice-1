@@ -94,10 +94,59 @@ func ValidateUser(user User) error {
 
 	return nil
 }
-func ValidateUserProfile(profile UserProfileDetails) error {
+
+// func ValidateUserProfile(profile UserProfileDetails) error {
+// 	validate := validator.New()
+
+// 	// Reuse the same date format validation
+// 	validate.RegisterValidation("dateformat", func(fl validator.FieldLevel) bool {
+// 		date := fl.Field().String()
+// 		if date == "" {
+// 			return true
+// 		}
+// 		matched, _ := regexp.MatchString(`^\d{4}-\d{2}-\d{2}$`, date)
+// 		return matched
+// 	})
+
+// 	err := validate.Struct(profile)
+// 	if err != nil {
+// 		validationErrors := err.(validator.ValidationErrors)
+// 		errorMessages := make([]string, len(validationErrors))
+
+// 		for i, validationErr := range validationErrors {
+// 			fieldName := validationErr.Field()
+// 			switch fieldName {
+
+// 			case "Email":
+// 				errorMessages[i] = "Invalid Email"
+
+// 			case "Username":
+// 				errorMessages[i] = "Invalid Username, Minimum 8 or Maximum 24 characters"
+
+// 			case "FirstName":
+// 				errorMessages[i] = "Invalid Firstname, Minimum 4 or Maximum 10 characters"
+
+// 			case "LastName":
+// 				errorMessages[i] = "Invalid Lastname, Minimum 4 or Maximum 10 characters"
+
+// 			case "PhoneNumber":
+// 				errorMessages[i] = "Invalid Phone Number"
+
+// 			case "DateOfBirth":
+// 				errorMessages[i] = "Invalid Date of Birth (YYYY-MM-DD)"
+
+// 			default:
+// 				errorMessages[i] = "Validation failed"
+// 			}
+// 		}
+
+//			return fmt.Errorf(strings.Join(errorMessages, ", "))
+//		}
+//		return nil
+//	}
+func ValidateUpdate(update UserProfileDetails) error {
 	validate := validator.New()
 
-	// Reuse the same date format validation
 	validate.RegisterValidation("dateformat", func(fl validator.FieldLevel) bool {
 		date := fl.Field().String()
 		if date == "" {
@@ -107,33 +156,24 @@ func ValidateUserProfile(profile UserProfileDetails) error {
 		return matched
 	})
 
-	err := validate.Struct(profile)
-	if err != nil {
+	if err := validate.Struct(update); err != nil {
 		validationErrors := err.(validator.ValidationErrors)
 		errorMessages := make([]string, len(validationErrors))
 
-		for i, validationErr := range validationErrors {
-			fieldName := validationErr.Field()
-			switch fieldName {
-
+		for i, v := range validationErrors {
+			switch v.Field() {
 			case "Email":
-				errorMessages[i] = "Invalid Email"
-
+				errorMessages[i] = "Invalid email format"
 			case "Username":
-				errorMessages[i] = "Invalid Username, Minimum 8 or Maximum 24 characters"
-
+				errorMessages[i] = "Username must be 8–24 characters"
 			case "FirstName":
-				errorMessages[i] = "Invalid Firstname, Minimum 4 or Maximum 10 characters"
-
+				errorMessages[i] = "Firstname must be 4–10 characters"
 			case "LastName":
-				errorMessages[i] = "Invalid Lastname, Minimum 4 or Maximum 10 characters"
-
+				errorMessages[i] = "Lastname must be 4–10 characters"
 			case "PhoneNumber":
-				errorMessages[i] = "Invalid Phone Number"
-
+				errorMessages[i] = "Phone must be 10 digits"
 			case "DateOfBirth":
-				errorMessages[i] = "Invalid Date of Birth (YYYY-MM-DD)"
-
+				errorMessages[i] = "DOB must be YYYY-MM-DD"
 			default:
 				errorMessages[i] = "Validation failed"
 			}
@@ -141,5 +181,6 @@ func ValidateUserProfile(profile UserProfileDetails) error {
 
 		return fmt.Errorf(strings.Join(errorMessages, ", "))
 	}
+
 	return nil
 }

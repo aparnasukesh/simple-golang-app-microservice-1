@@ -101,7 +101,7 @@ func (h *Handler) updateUserProfile(ctx *gin.Context) {
 	}
 
 	// 🔥 ADD VALIDATION HERE
-	if err := ValidateUserProfile(user); err != nil {
+	if err := ValidateUpdate(user); err != nil {
 		h.responseWithError(ctx, http.StatusBadRequest, err)
 		return
 	}
