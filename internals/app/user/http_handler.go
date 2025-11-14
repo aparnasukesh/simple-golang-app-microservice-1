@@ -20,7 +20,7 @@ func NewHttpHandler(svc Service) *Handler {
 
 func (h *Handler) Routes(r *gin.RouterGroup) {
 	r.POST("/register", h.registerUser)
-	r.PUT("/profile/:id", h.updateUserProfile)
+	r.PATCH("/profile/:id", h.updateUserProfile)
 	r.DELETE("/profile/:id", h.deleteUserProfile)
 	r.GET("/profile/:id", h.getUserProfileDetails)
 	r.POST("/methods", h.listUsers)
@@ -64,28 +64,6 @@ func (h *Handler) getUserProfileDetails(ctx *gin.Context) {
 	h.responseWithData(ctx, http.StatusOK, "User profile details retrieved successfully", profileDetails)
 }
 
-//	func (h *Handler) updateUserProfile(ctx *gin.Context) {
-//		idstr := ctx.Param("id")
-//		id, err := strconv.Atoi(idstr)
-//		if err != nil {
-//			formattedError := ExtractErrorMessage(err)
-//			h.responseWithError(ctx, http.StatusInternalServerError, errors.New(formattedError))
-//			return
-//		}
-//		user := &UserProfileDetails{}
-//		if err := ctx.ShouldBindJSON(&user); err != nil {
-//			formattedError := ExtractErrorMessage(err)
-//			h.responseWithError(ctx, http.StatusBadRequest, errors.New(formattedError))
-//			return
-//		}
-//		err = h.svc.UpdateUserProfile(ctx, id, *user)
-//		if err != nil {
-//			formattedError := ExtractErrorMessage(err)
-//			h.responseWithError(ctx, http.StatusNotFound, errors.New(formattedError))
-//			return
-//		}
-//		h.response(ctx, http.StatusOK, "update user profile successfull")
-//	}
 func (h *Handler) updateUserProfile(ctx *gin.Context) {
 	idstr := ctx.Param("id")
 	id, err := strconv.Atoi(idstr)
@@ -100,7 +78,6 @@ func (h *Handler) updateUserProfile(ctx *gin.Context) {
 		return
 	}
 
-	// 🔥 ADD VALIDATION HERE
 	if err := ValidateUpdate(user); err != nil {
 		h.responseWithError(ctx, http.StatusBadRequest, err)
 		return

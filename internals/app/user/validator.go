@@ -144,6 +144,48 @@ func ValidateUser(user User) error {
 //		}
 //		return nil
 //	}
+
+// func ValidateUpdate(update UserProfileDetails) error {
+// 	validate := validator.New()
+
+// 	validate.RegisterValidation("dateformat", func(fl validator.FieldLevel) bool {
+// 		date := fl.Field().String()
+// 		if date == "" {
+// 			return true
+// 		}
+// 		matched, _ := regexp.MatchString(`^\d{4}-\d{2}-\d{2}$`, date)
+// 		return matched
+// 	})
+
+// 	if err := validate.Struct(update); err != nil {
+// 		validationErrors := err.(validator.ValidationErrors)
+// 		errorMessages := make([]string, len(validationErrors))
+
+// 		for i, v := range validationErrors {
+// 			switch v.Field() {
+// 			case "Email":
+// 				errorMessages[i] = "Invalid email format"
+// 			case "Username":
+// 				errorMessages[i] = "Username must be 8–24 characters"
+// 			case "FirstName":
+// 				errorMessages[i] = "Firstname must be 4–10 characters"
+// 			case "LastName":
+// 				errorMessages[i] = "Lastname must be 4–10 characters"
+// 			case "PhoneNumber":
+// 				errorMessages[i] = "Phone must be 10 digits"
+// 			case "DateOfBirth":
+// 				errorMessages[i] = "DOB must be YYYY-MM-DD"
+// 			default:
+// 				errorMessages[i] = "Validation failed"
+// 			}
+// 		}
+
+// 		return fmt.Errorf(strings.Join(errorMessages, ", "))
+// 	}
+
+// 	return nil
+// }
+
 func ValidateUpdate(update UserProfileDetails) error {
 	validate := validator.New()
 
