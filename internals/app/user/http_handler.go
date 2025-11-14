@@ -64,27 +64,55 @@ func (h *Handler) getUserProfileDetails(ctx *gin.Context) {
 	h.responseWithData(ctx, http.StatusOK, "User profile details retrieved successfully", profileDetails)
 }
 
+//	func (h *Handler) updateUserProfile(ctx *gin.Context) {
+//		idstr := ctx.Param("id")
+//		id, err := strconv.Atoi(idstr)
+//		if err != nil {
+//			formattedError := ExtractErrorMessage(err)
+//			h.responseWithError(ctx, http.StatusInternalServerError, errors.New(formattedError))
+//			return
+//		}
+//		user := &UserProfileDetails{}
+//		if err := ctx.ShouldBindJSON(&user); err != nil {
+//			formattedError := ExtractErrorMessage(err)
+//			h.responseWithError(ctx, http.StatusBadRequest, errors.New(formattedError))
+//			return
+//		}
+//		err = h.svc.UpdateUserProfile(ctx, id, *user)
+//		if err != nil {
+//			formattedError := ExtractErrorMessage(err)
+//			h.responseWithError(ctx, http.StatusNotFound, errors.New(formattedError))
+//			return
+//		}
+//		h.response(ctx, http.StatusOK, "update user profile successfull")
+//	}
 func (h *Handler) updateUserProfile(ctx *gin.Context) {
 	idstr := ctx.Param("id")
 	id, err := strconv.Atoi(idstr)
 	if err != nil {
-		formattedError := ExtractErrorMessage(err)
-		h.responseWithError(ctx, http.StatusInternalServerError, errors.New(formattedError))
+		h.responseWithError(ctx, http.StatusBadRequest, errors.New("Invalid user ID"))
 		return
 	}
-	user := &UserProfileDetails{}
+
+	user := UserProfileDetails{}
 	if err := ctx.ShouldBindJSON(&user); err != nil {
-		formattedError := ExtractErrorMessage(err)
-		h.responseWithError(ctx, http.StatusBadRequest, errors.New(formattedError))
+		h.responseWithError(ctx, http.StatusBadRequest, errors.New("Invalid JSON body"))
 		return
 	}
-	err = h.svc.UpdateUserProfile(ctx, id, *user)
+
+	// 🔥 ADD VALIDATION HERE
+	if err := ValidateUserProfile(user); err != nil {
+		h.responseWithError(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	err = h.svc.UpdateUserProfile(ctx, id, user)
 	if err != nil {
-		formattedError := ExtractErrorMessage(err)
-		h.responseWithError(ctx, http.StatusNotFound, errors.New(formattedError))
+		h.responseWithError(ctx, http.StatusNotFound, err)
 		return
 	}
-	h.response(ctx, http.StatusOK, "update user profile successfull")
+
+	h.response(ctx, http.StatusOK, "update user profile successful")
 }
 
 func (h *Handler) listUsers(ctx *gin.Context) {

@@ -13,6 +13,7 @@ import "gorm.io/gorm"
 //		DateOfBirth string `json:"date_of_birth"`
 //		Gender      string `json:"gender"`
 //	}
+
 type User struct {
 	gorm.Model
 	Username    string `gorm:"not null" json:"username" validate:"required,min=8,max=24"`
