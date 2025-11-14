@@ -86,8 +86,41 @@ func (r *repository) ListUsers(ctx context.Context) ([]User, error) {
 	return users, nil
 }
 
+// func (r *repository) UpdateUserProfile(ctx context.Context, updateUser UserProfileDetails, id int) error {
+// 	// Prepare a map for dynamic updates
+// 	updateFields := map[string]interface{}{}
+
+// 	if updateUser.Username != "" {
+// 		updateFields["username"] = updateUser.Username
+// 	}
+// 	if updateUser.FirstName != "" {
+// 		updateFields["firstname"] = updateUser.FirstName
+// 	}
+// 	if updateUser.LastName != "" {
+// 		updateFields["lastname"] = updateUser.LastName
+// 	}
+// 	if updateUser.PhoneNumber != "" {
+// 		updateFields["phone"] = updateUser.PhoneNumber
+// 	}
+// 	if updateUser.Email != "" {
+// 		updateFields["email"] = updateUser.Email
+// 	}
+// 	if updateUser.DateOfBirth != "" {
+// 		updateFields["dateofbirth"] = updateUser.DateOfBirth
+// 	}
+// 	if updateUser.Gender != "" {
+// 		updateFields["gender"] = updateUser.Gender
+// 	}
+
+// 	// Perform the update with dynamic fields
+// 	result := r.db.Model(&User{}).Where("id = ?", id).Updates(updateFields)
+// 	if result.Error != nil {
+// 		return result.Error
+// 	}
+
+//		return nil
+//	}
 func (r *repository) UpdateUserProfile(ctx context.Context, updateUser UserProfileDetails, id int) error {
-	// Prepare a map for dynamic updates
 	updateFields := map[string]interface{}{}
 
 	if updateUser.Username != "" {
@@ -97,25 +130,30 @@ func (r *repository) UpdateUserProfile(ctx context.Context, updateUser UserProfi
 		updateFields["first_name"] = updateUser.FirstName
 	}
 	if updateUser.LastName != "" {
-		updateFields["lastname"] = updateUser.LastName
+		updateFields["last_name"] = updateUser.LastName
 	}
 	if updateUser.PhoneNumber != "" {
-		updateFields["phone"] = updateUser.PhoneNumber
+		updateFields["phone_number"] = updateUser.PhoneNumber
 	}
 	if updateUser.Email != "" {
 		updateFields["email"] = updateUser.Email
 	}
 	if updateUser.DateOfBirth != "" {
-		updateFields["dateofbirth"] = updateUser.DateOfBirth
+		updateFields["date_of_birth"] = updateUser.DateOfBirth
 	}
 	if updateUser.Gender != "" {
 		updateFields["gender"] = updateUser.Gender
 	}
 
-	// Perform the update with dynamic fields
-	result := r.db.Model(&User{}).Where("id = ?", id).Updates(updateFields)
+	result := r.db.Model(&User{}).
+		Where("id = ? AND deleted_at IS NULL", id).
+		Updates(updateFields)
+
 	if result.Error != nil {
 		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
 	}
 
 	return nil
